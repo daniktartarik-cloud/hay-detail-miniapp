@@ -1,0 +1,1019 @@
+<meta charset="UTF-8">
+<title>Hay Detail Калькулятор</title>
+<style>
+  :root{
+    --bg:#141316;
+    --surface:#1d1b1f;
+    --surface-2:#252227;
+    --surface-3:#2e2a30;
+    --border:#3a353b;
+    --text:#f5f2ef;
+    --text-muted:#a39da3;
+    --text-dim:#716b73;
+    --accent:#e2203f;
+    --accent-strong:#ff3a56;
+    --accent-dim:#4a1119;
+    --accent-ink:#fff6f3;
+    --success:#35c47a;
+    --glass-fill:rgba(255,255,255,.055);
+    --glass-fill-strong:rgba(255,255,255,.095);
+    --glass-border:rgba(255,255,255,.14);
+    --glass-highlight:rgba(255,255,255,.3);
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Manrope', system-ui, sans-serif;
+    display:flex;
+    justify-content:center;
+    padding-inline:16px;
+    min-height:100%;
+  }
+  .app-wrap{
+    width:100%;
+    max-width:460px;
+    padding-block:28px 48px;
+  }
+  .phone{
+    position:relative;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:28px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.6);
+  }
+  .phone::before{
+    content:"";
+    position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(226,32,63,.38), transparent 38%),
+      radial-gradient(circle at 92% 22%, rgba(255,255,255,.07), transparent 34%),
+      radial-gradient(circle at 70% 95%, rgba(226,32,63,.3), transparent 42%),
+      radial-gradient(circle at 10% 70%, rgba(226,32,63,.16), transparent 40%);
+  }
+  .phone > *{position:relative; z-index:1;}
+  .tg-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px;
+    background:var(--glass-fill);
+    backdrop-filter:blur(16px) saturate(160%);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);
+    border-bottom:1px solid var(--glass-border);
+  }
+  .tg-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);}
+  .tg-bar span{font-size:13px;color:var(--text-muted);font-weight:600;letter-spacing:.02em;}
+  .draft-pill{
+    margin-left:auto;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--accent-ink);
+    background:var(--accent-dim);
+    border:1px solid var(--accent);
+    padding:3px 8px;
+    border-radius:999px;
+  }
+
+  .hero{
+    position:relative;
+    padding:30px 20px 24px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    opacity:.4;
+    background-image:
+      linear-gradient(30deg, var(--border) 12%, transparent 12.5%, transparent 87%, var(--border) 87.5%, var(--border)),
+      linear-gradient(150deg, var(--border) 12%, transparent 12.5%, transparent 87%, var(--border) 87.5%, var(--border)),
+      linear-gradient(30deg, var(--border) 12%, transparent 12.5%, transparent 87%, var(--border) 87.5%, var(--border)),
+      linear-gradient(150deg, var(--border) 12%, transparent 12.5%, transparent 87%, var(--border) 87.5%, var(--border)),
+      linear-gradient(60deg, var(--accent-dim) 25%, transparent 25.5%, transparent 75%, var(--accent-dim) 75%, var(--accent-dim)),
+      linear-gradient(60deg, var(--accent-dim) 25%, transparent 25.5%, transparent 75%, var(--accent-dim) 75%, var(--accent-dim));
+    background-size:44px 76px;
+    background-position:0 0, 0 0, 22px 38px, 22px 38px, 0 0, 22px 38px;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(20,19,22,.2) 0%, var(--surface) 94%);
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .brand-stack{display:flex; align-items:center; gap:14px;}
+  .brand-plate{
+    flex:0 0 auto;
+    width:108px; height:108px;
+    border-radius:14px;
+    background:radial-gradient(circle at 35% 30%, #232023, #0e0d0f 72%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:inset 0 0 0 1px var(--border);
+  }
+  .brand-logo{width:92px; height:92px; object-fit:contain; display:block;}
+  .brand-side{display:flex; flex-direction:column; gap:8px;}
+  .redteam{
+    font-family:'Bungee','Arial Narrow',sans-serif;
+    font-size:17px;
+    color:#fff;
+    background:var(--accent);
+    padding:3px 10px;
+    transform:skewX(-8deg);
+    display:inline-block;
+    letter-spacing:.03em;
+    width:fit-content;
+  }
+  .redteam span{display:inline-block; transform:skewX(8deg);}
+  .car-btn{
+    margin-top:16px;
+    width:100%;
+    text-align:center;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--text);
+    background:var(--glass-fill-strong);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid var(--accent);
+    box-shadow:inset 0 1px 0 var(--glass-highlight);
+    padding:12px;
+    cursor:pointer;
+  }
+  .checker-strip{
+    height:9px;
+    background-color:#0b0a0c;
+    background-image:
+      linear-gradient(45deg, var(--accent) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--accent) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--accent) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--accent) 75%);
+    background-size:14px 14px;
+    background-position:0 0, 0 7px, 7px -7px, -7px 0px;
+  }
+  .slogan{
+    margin-top:10px;
+    color:var(--text-muted);
+    font-size:14.5px;
+    max-width:30ch;
+  }
+  .stats{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+  }
+  .stat{
+    flex:1;
+    background:var(--glass-fill);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid var(--glass-border);
+    border-left:3px solid var(--accent);
+    box-shadow:inset 0 1px 0 var(--glass-highlight);
+    padding:9px 10px;
+    font-family:'Manrope',sans-serif;
+  }
+  .stat b{
+    font-family:'Anton',sans-serif;
+    font-size:19px;
+    display:block;
+    line-height:1;
+  }
+  .stat small{color:var(--text-muted); font-size:11px;}
+
+  .section{padding:20px;}
+  .section + .section{border-top:1px solid var(--glass-border);}
+  .eyebrow{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  h2{
+    font-family:'Anton', sans-serif;
+    font-size:21px;
+    text-transform:uppercase;
+    letter-spacing:.01em;
+    margin:0 0 4px;
+  }
+  .sub{color:var(--text-muted); font-size:13px; margin:0 0 14px;}
+
+  .services-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .svc-card{
+    background:var(--glass-fill);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid var(--glass-border);
+    box-shadow:inset 0 1px 0 var(--glass-highlight);
+    padding:12px;
+    position:relative;
+  }
+  .svc-card.active{
+    border-color:var(--accent);
+    background:linear-gradient(135deg, rgba(226,32,63,.4), var(--glass-fill-strong));
+    cursor:pointer;
+  }
+  .svc-card b{font-size:13px; display:block; line-height:1.25;}
+  .svc-tag{
+    font-size:9.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--text-dim);
+    margin-top:6px;
+    display:inline-block;
+  }
+  .svc-card.active .svc-tag{color:var(--accent-ink); background:var(--accent); padding:2px 6px;}
+
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .chip{
+    flex:1 1 auto;
+    min-width:64px;
+    text-align:center;
+    background:var(--glass-fill);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid var(--glass-border);
+    box-shadow:inset 0 1px 0 var(--glass-highlight);
+    padding:10px 6px 8px;
+    cursor:pointer;
+    font-family:'Manrope',sans-serif;
+  }
+  .chip b{
+    font-family:'Anton',sans-serif;
+    font-size:15px;
+    display:block;
+  }
+  .chip small{font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.03em;}
+  .chip.sel{
+    border-color:var(--accent);
+    background:var(--accent);
+    clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+  }
+  .chip.sel b, .chip.sel small{color:var(--accent-ink);}
+  .class-examples{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--text-muted);
+    background:var(--glass-fill);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid var(--glass-border);
+    border-left:3px solid var(--accent);
+    padding:8px 10px;
+  }
+
+  .tabs{display:flex; gap:6px; margin-top:18px; margin-bottom:4px;}
+  .tab{
+    flex:1;
+    text-align:center;
+    font-size:11.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+    padding:9px 4px;
+    color:var(--text-muted);
+    background:var(--glass-fill);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid var(--glass-border);
+    cursor:pointer;
+  }
+  .tab.sel{color:var(--accent-ink); background:var(--accent); border-color:var(--accent);}
+
+  .item-list{
+    display:flex; flex-direction:column; margin-top:12px;
+    background:var(--glass-fill);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid var(--glass-border);
+    box-shadow:inset 0 1px 0 var(--glass-highlight);
+  }
+  .item-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 12px;
+    background:transparent;
+    cursor:pointer;
+  }
+  .item-row + .item-row{border-top:1px solid var(--glass-border);}
+  .item-row.on{background:rgba(226,32,63,.16);}
+  .mark{
+    width:18px;height:18px;
+    border:1.5px solid var(--text-dim);
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .item-row.on .mark{background:var(--accent); border-color:var(--accent);}
+  .mark.round{border-radius:50%;}
+  .mark svg{width:11px;height:11px; display:none;}
+  .item-row.on .mark svg{display:block;}
+  .item-name{flex:1; font-size:13.5px; line-height:1.3;}
+  .item-price{
+    font-family:'Anton',sans-serif;
+    font-size:14px;
+    color:var(--text);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .item-row.on .item-price{color:var(--accent-ink);}
+  .note{
+    margin-top:10px;
+    font-size:11.5px;
+    color:var(--text-dim);
+    line-height:1.4;
+  }
+  .note b{color:var(--accent);}
+
+  .total-bar{
+    position:sticky;
+    bottom:0;
+    background:var(--glass-fill-strong);
+    backdrop-filter:blur(22px) saturate(170%);
+    -webkit-backdrop-filter:blur(22px) saturate(170%);
+    border-top:1px solid var(--accent);
+    box-shadow:inset 0 1px 0 var(--glass-highlight);
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .total-text{flex:1;}
+  .total-label{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .total-val{font-family:'Anton',sans-serif; font-size:21px; font-variant-numeric:tabular-nums;}
+  .cta{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--accent-ink);
+    background:var(--accent);
+    border:none;
+    padding:13px 18px;
+    cursor:pointer;
+    clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+  }
+  .cta:disabled{background:var(--surface-3); color:var(--text-dim); cursor:not-allowed;}
+  .cta:focus-visible, .chip:focus-visible, .tab:focus-visible, .item-row:focus-visible, .svc-card.active:focus-visible{outline:2px solid var(--accent-strong); outline-offset:2px;}
+
+  .swatches{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .swatch{
+    width:30px; height:30px; border-radius:50%;
+    border:2px solid var(--glass-border);
+    cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .swatch.sel{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent), inset 0 1px 0 rgba(255,255,255,.4);}
+  .file-label{
+    display:inline-block;
+    font-family:'Manrope',sans-serif;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--text);
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    padding:9px 14px;
+    cursor:pointer;
+    margin-bottom:12px;
+  }
+  .file-label input{display:none;}
+  .car-canvas-wrap{
+    background:var(--glass-fill);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid var(--glass-border);
+    padding:8px;
+    margin-bottom:12px;
+  }
+  #carCanvas{width:100%; height:auto; display:block;}
+  .detect-row{display:flex; gap:8px; margin-top:10px;}
+  .detect-row input{flex:1;}
+
+  .footer{padding:20px; font-size:12px; color:var(--text-dim); line-height:1.6;}
+  .footer b{color:var(--text-muted); display:block; margin-bottom:6px; font-size:13px;}
+  .ph{color:var(--text-dim); font-style:italic;}
+
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(10,9,10,.55);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    display:flex; align-items:flex-end; justify-content:center;
+    z-index:10;
+  }
+  .overlay[hidden]{display:none!important;}
+  .sheet{
+    width:100%; max-width:460px;
+    background:var(--glass-fill-strong);
+    backdrop-filter:blur(28px) saturate(170%);
+    -webkit-backdrop-filter:blur(28px) saturate(170%);
+    border:1px solid var(--glass-border);
+    border-bottom:none;
+    box-shadow:inset 0 1px 0 var(--glass-highlight);
+    border-radius:18px 18px 0 0;
+    padding:20px;
+    max-height:86vh;
+    overflow-y:auto;
+  }
+  .sheet-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 14px;}
+  .field{display:flex; flex-direction:column; gap:6px; margin-bottom:12px;}
+  .field label{font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted);}
+  .field input, .field textarea{
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    color:var(--text);
+    padding:10px 12px;
+    font-family:'Manrope',sans-serif;
+    font-size:14px;
+  }
+  .field input:focus, .field textarea:focus{outline:none; border-color:var(--accent);}
+  .summary-box{
+    background:var(--glass-fill);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border:1px solid var(--glass-border);
+    border-left:3px solid var(--accent);
+    padding:10px 12px;
+    font-size:12.5px;
+    color:var(--text-muted);
+    margin-bottom:14px;
+  }
+  .summary-box b{color:var(--text);}
+  .sheet-close{
+    background:none;border:none;color:var(--text-dim);
+    font-size:13px; padding:6px 0; cursor:pointer;
+    text-decoration:underline;
+  }
+  .success{
+    text-align:center;
+    padding:20px 4px 6px;
+  }
+  .success .ico{
+    width:44px;height:44px;border-radius:50%;
+    background:var(--accent-dim); border:1px solid var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 14px;
+  }
+  .success h3{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:18px; margin:0 0 8px;}
+  .success p{color:var(--text-muted); font-size:13px; line-height:1.5; margin:0 0 16px;}
+
+  @media (prefers-reduced-motion: no-preference){
+    .item-row, .chip, .tab, .cta{transition:background-color .15s ease, border-color .15s ease, color .15s ease;}
+  }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bungee&family=Manrope:wght@400;600;700;800&display=swap">
+
+<div class="app-wrap">
+  <div class="phone">
+
+    <div class="tg-bar">
+      <div class="tg-dot"></div>
+      <span>Hay Detail × RED TEAM</span>
+      <span class="draft-pill">макет</span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="brand-stack">
+          <div class="brand-plate">
+            <img class="brand-logo" src="hay-detail-logo.png" alt="Hay Detail — Auto Detailing">
+          </div>
+          <div class="brand-side">
+            <span class="redteam"><span>RED TEAM</span></span>
+            <p class="slogan" style="margin-top:0;">Твой автомобиль заслуживает защиты и стиля</p>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>7</b><small>направлений работ</small></div>
+          <div class="stat"><b>500+</b><small>оттенков плёнки</small></div>
+        </div>
+        <button class="car-btn" id="myCarBtn" type="button">🚘 Мой автомобиль — узнать класс и цвет</button>
+      </div>
+    </div>
+    <div class="checker-strip" aria-hidden="true"></div>
+
+    <div class="section">
+      <div class="eyebrow">Услуги</div>
+      <h2>Что делаем в студии</h2>
+      <p class="sub">Химки · полный цикл защиты и внешнего вида кузова</p>
+      <div class="services-grid">
+        <div class="svc-card active" id="svcWrap" tabindex="0" role="button" aria-label="Перейти к калькулятору оклейки">
+          <b>Оклейка и защита плёнкой</b>
+          <span class="svc-tag">Расчёт цены →</span>
+        </div>
+        <div class="svc-card"><b>Смена цвета кузова</b><span class="svc-tag">Скоро</span></div>
+        <div class="svc-card"><b>Тонировка стёкол</b><span class="svc-tag">Скоро</span></div>
+        <div class="svc-card"><b>Антихром</b><span class="svc-tag">Скоро</span></div>
+        <div class="svc-card"><b>Полировка кузова</b><span class="svc-tag">Скоро</span></div>
+        <div class="svc-card"><b>Керамическое покрытие</b><span class="svc-tag">Скоро</span></div>
+        <div class="svc-card"><b>Химчистка салона</b><span class="svc-tag">Скоро</span></div>
+        <div class="svc-card"><b>Мото</b><span class="svc-tag">Скоро</span></div>
+      </div>
+    </div>
+
+    <div class="section" id="myCarSection" hidden>
+      <div class="eyebrow">Мой автомобиль</div>
+      <h2>Узнай класс и цвет</h2>
+      <p class="sub">Демо-версия: марку распознаёт простой список в этой странице. В готовом боте это будет делать ИИ — поймёт любую модель, а не только из списка.</p>
+
+      <div class="field">
+        <label for="carInput">Марка, модель и год</label>
+        <div class="detect-row">
+          <input id="carInput" type="text" placeholder="Например: BMW 3 серии, 2019" autocomplete="off">
+          <button class="cta" id="detectBtn" type="button">Найти класс</button>
+        </div>
+      </div>
+      <div class="class-examples" id="detectResult" hidden></div>
+
+      <div class="eyebrow" style="margin-top:22px;">Фото и цвет</div>
+      <h2>Как будет выглядеть</h2>
+      <p class="sub">Загрузи фото своей машины (или посмотри на примере) — выбери цвет и тип покрытия</p>
+
+      <label class="file-label">
+        Загрузить фото машины
+        <input id="photoInput" type="file" accept="image/*">
+      </label>
+      <div class="car-canvas-wrap">
+        <canvas id="carCanvas" width="640" height="380"></canvas>
+      </div>
+
+      <div class="eyebrow" style="margin-top:4px;">Цвет</div>
+      <div class="swatches" id="colorSwatches"></div>
+
+      <div class="eyebrow" style="margin-top:16px;">Покрытие</div>
+      <div class="tabs" id="finishTabs"></div>
+      <p class="note">Это цветовой фильтр поверх фото для наглядности, не точный рендер оплётки. Без загруженного фото показываем условный силуэт.</p>
+    </div>
+
+    <div class="section" id="calculator">
+      <div class="eyebrow">Шаг 1</div>
+      <h2>Класс автомобиля</h2>
+      <p class="sub">От него зависит цена работ</p>
+      <div class="chip-row" id="classRow" role="group" aria-label="Класс автомобиля"></div>
+      <div class="class-examples" id="classExamples"></div>
+
+      <div class="eyebrow" style="margin-top:22px;">Шаг 2</div>
+      <h2>Вид работ</h2>
+      <div class="tabs" id="groupTabs" role="tablist"></div>
+      <div class="item-list" id="itemList" role="group"></div>
+      <p class="note" id="noteBox"></p>
+    </div>
+
+    <div class="total-bar">
+      <div class="total-text">
+        <div class="total-label">Итого выбрано</div>
+        <div class="total-val" id="totalVal">0 ₽</div>
+      </div>
+      <button class="cta" id="bookBtn" disabled>Записаться</button>
+    </div>
+
+    <div class="footer">
+      <b>Контакты</b>
+      г. Химки, <span class="ph">[адрес студии]</span><br>
+      <span class="ph">[телефон студии]</span> · <span class="ph">[режим работы]</span><br><br>
+      Цены предварительные, из действующего прайс-листа студии. Для редких комплектаций, нестандартных моделей и класса «Эксклюзив» точная цена — после осмотра автомобиля.
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div id="sheetForm">
+      <h2 style="margin-bottom:4px;">Записаться</h2>
+      <p class="sub">Оставь контакты — мастер уточнит детали</p>
+      <div class="summary-box" id="sheetSummary"></div>
+      <div class="field">
+        <label for="fName">Имя</label>
+        <input id="fName" type="text" placeholder="Как к тебе обращаться" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="fPhone">Телефон</label>
+        <input id="fPhone" type="tel" placeholder="+7 ___ ___-__-__" autocomplete="tel">
+      </div>
+      <div class="field">
+        <label for="fComment">Комментарий (не обязательно)</label>
+        <textarea id="fComment" rows="2" placeholder="Например: цвет авто, пожелания"></textarea>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:16px;">
+        <button class="cta" id="sendBtn" style="flex:1;">Отправить заявку</button>
+        <button class="sheet-close" id="closeBtn" type="button">Закрыть</button>
+      </div>
+    </div>
+    <div id="sheetSuccess" hidden class="success">
+      <div class="ico">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10.5L8 14.5L16 6" stroke="#ff3a56" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Заявка готова</h3>
+      <p>В этом макете отправка не подключена. В готовой мини-апке данные уйдут сразу в Telegram-бота студии через <code>Telegram.WebApp.sendData()</code> — мастеру придёт заявка с выбором клиента.</p>
+      <button class="cta" id="closeBtn2" type="button" style="width:100%;">Понятно, закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // --- Данные прайс-листа: "Оклейка и защита плёнкой" ---
+  // from: приблизительная цена "от N"; range: [min,max]; число — фикс. цена
+  var CLASSES = [
+    {key:'M',   label:'M',   sub:'Малый класс', examples:'Mercedes C-класс, Hyundai Solaris, Lada, Kia Rio, BMW 1 серии'},
+    {key:'L',   label:'L',   sub:'Бизнес-класс', examples:'Mercedes E-класс, BMW (кроме 1 серии), кроссоверы, Mercedes GLE'},
+    {key:'XL',  label:'XL',  sub:'Большой класс', examples:'Mercedes GLS, BMW X7, Range Rover, Li L9'},
+    {key:'XXL', label:'XXL', sub:'Минивэн', examples:'Mercedes V-класс, Mercedes G-класс 6x6, Zeekr 009'},
+    {key:'EXC', label:'Экскл.', sub:'Спорт / люкс', examples:'Ferrari, Lamborghini, Porsche, BMW M-серии, Bentley, Rolls-Royce'}
+  ];
+
+  var GROUPS = [
+    {
+      key:'full', label:'Полная оклейка', type:'radio',
+      items:[
+        {id:'ppf_color', name:'Полиуретан цветной (PPF)', price:{M:185000, L:{range:[195000,225000]}, XL:225000, XXL:260000, EXC:{from:280000}}},
+        {id:'ppf_clear', name:'Полиуретан прозрачный (PPF)', price:{M:155000, L:{range:[160000,190000]}, XL:195000, XXL:260000, EXC:{from:250000}}}
+      ]
+    },
+    {
+      key:'zones', label:'Зона риска', type:'check',
+      items:[
+        {id:'z_fara',   name:'Передние фары',            price:{M:6000,  L:{from:6000},  XL:{from:7000},  XXL:{from:6000},  EXC:{from:10000}}},
+        {id:'z_bump',   name:'Передний бампер',          price:{M:10000, L:{from:11000}, XL:{from:13000}, XXL:{from:11000}, EXC:{from:15000}}},
+        {id:'z_hood',   name:'Капот',                    price:{M:10000, L:{from:12000}, XL:{from:13000}, XXL:{from:12000}, EXC:{from:15000}}},
+        {id:'z_wing',   name:'Передние крылья (боковые)',price:{M:10000, L:{from:12000}, XL:{from:13000}, XXL:{from:12000}, EXC:{from:15000}}},
+        {id:'z_pillar', name:'Стойки (лобовые)',         price:{M:8000,  L:{from:8000},  XL:{from:8000},  XXL:{from:8000},  EXC:{from:8000}}},
+        {id:'z_mirror', name:'Зеркала',                  price:{M:6000,  L:{from:6000},  XL:{from:6000},  XXL:{from:6000},  EXC:{from:6000}}},
+        {id:'z_roof',   name:'Малая часть крыши (у лобового стекла)', price:{M:15000, L:15000, XL:20000, XXL:{from:15000}, EXC:{from:22000}}},
+        {id:'z_kit',    name:'Комплект «Зона риска» целиком', price:{M:65000, L:{from:70000}, XL:{from:80000}, XXL:{from:70000}, EXC:{from:91000}}}
+      ]
+    },
+    {
+      key:'extra', label:'Доп. защита', type:'check',
+      items:[
+        {id:'e_chrome', name:'Антихром',                               price:{M:25000, L:35000, XL:40000, XXL:45000, EXC:{from:35000}}},
+        {id:'e_wind',   name:'Бронировка лобового стекла',             price:{M:15000, L:200000, XL:200000, XXL:200000, EXC:{from:250000}}},
+        {id:'e_tint',   name:'Тонировка, полная сфера',                 price:{M:30000, L:30000, XL:30000, XXL:30000, EXC:{from:30000}}},
+        {id:'e_tintf',  name:'Тонировка, передняя полусфера',           price:{M:15000, L:15000, XL:15000, XXL:15000, EXC:{from:15000}}},
+        {id:'e_ather',  name:'Атермальная тонировка, полная сфера',     price:{M:20000, L:20000, XL:20000, XXL:20000, EXC:{from:20000}}},
+        {id:'e_atherf', name:'Атермальная тонировка, передняя полусфера', price:{M:10000, L:10000, XL:10000, XXL:10000, EXC:{from:10000}}},
+        {id:'e_combo',  name:'Бронеплёнка + атермальная (комбо)',       price:{M:40000, L:40000, XL:40000, XXL:40000, EXC:{from:40000}}}
+      ]
+    }
+  ];
+
+  function fmtNum(n){ return n.toLocaleString('ru-RU'); }
+  function fmtPrice(p){
+    if (typeof p === 'number') return fmtNum(p) + ' ₽';
+    if (p.range) return fmtNum(p.range[0]) + '–' + fmtNum(p.range[1]) + ' ₽';
+    if (p.from)  return 'от ' + fmtNum(p.from) + ' ₽';
+    return '—';
+  }
+  function minVal(p){
+    if (typeof p === 'number') return p;
+    if (p.range) return p.range[0];
+    if (p.from)  return p.from;
+    return 0;
+  }
+  function isApprox(p){ return typeof p !== 'number'; }
+
+  var state = { cls:'M', group:'full', selected:{ppf_color:true} };
+
+  var classRow = document.getElementById('classRow');
+  var classExamples = document.getElementById('classExamples');
+  var groupTabs = document.getElementById('groupTabs');
+  var itemList = document.getElementById('itemList');
+  var noteBox = document.getElementById('noteBox');
+  var totalVal = document.getElementById('totalVal');
+  var bookBtn = document.getElementById('bookBtn');
+
+  function renderClasses(){
+    classRow.innerHTML = '';
+    CLASSES.forEach(function(c){
+      var el = document.createElement('div');
+      el.className = 'chip' + (state.cls === c.key ? ' sel' : '');
+      el.tabIndex = 0;
+      el.setAttribute('role','button');
+      el.innerHTML = '<b>'+c.label+'</b><small>'+c.sub+'</small>';
+      el.addEventListener('click', function(){ state.cls = c.key; renderAll(); });
+      el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); state.cls=c.key; renderAll(); }});
+      classRow.appendChild(el);
+    });
+    var cur = CLASSES.filter(function(c){return c.key===state.cls;})[0];
+    classExamples.textContent = 'Например: ' + cur.examples;
+  }
+
+  function renderTabs(){
+    groupTabs.innerHTML = '';
+    GROUPS.forEach(function(g){
+      var el = document.createElement('div');
+      el.className = 'tab' + (state.group === g.key ? ' sel' : '');
+      el.setAttribute('role','tab');
+      el.tabIndex = 0;
+      el.textContent = g.label;
+      el.addEventListener('click', function(){ state.group = g.key; renderItems(); });
+      el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); state.group=g.key; renderItems(); }});
+      groupTabs.appendChild(el);
+    });
+  }
+
+  function renderItems(){
+    renderTabs();
+    var g = GROUPS.filter(function(x){return x.key===state.group;})[0];
+    itemList.innerHTML = '';
+    var hasFlag = false;
+    g.items.forEach(function(item){
+      var price = item.price[state.cls];
+      var checked = !!state.selected[item.id];
+      var row = document.createElement('div');
+      row.className = 'item-row' + (checked ? ' on' : '');
+      row.tabIndex = 0;
+      row.setAttribute('role', g.type === 'radio' ? 'radio' : 'checkbox');
+      row.setAttribute('aria-checked', checked);
+      var markShape = g.type === 'radio' ? 'mark round' : 'mark';
+      row.innerHTML =
+        '<div class="'+markShape+'"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10.5L8 14.5L16 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'+
+        '<div class="item-name">'+item.name+(item.flag ? ' *' : '')+'</div>'+
+        '<div class="item-price">'+fmtPrice(price)+'</div>';
+      row.addEventListener('click', function(){ toggleItem(g, item); });
+      row.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleItem(g, item); }});
+      itemList.appendChild(row);
+      if (item.flag) hasFlag = true;
+    });
+    var notes = ['Цена предварительная. Точная стоимость для нестандартных моделей и комплектаций — после осмотра.'];
+    if (hasFlag) notes.push('<b>*</b> ' + g.items.filter(function(i){return i.flag;})[0].flag);
+    noteBox.innerHTML = notes.join('<br>');
+  }
+
+  function toggleItem(g, item){
+    if (g.type === 'radio'){
+      g.items.forEach(function(i){ delete state.selected[i.id]; });
+      state.selected[item.id] = true;
+    } else {
+      if (state.selected[item.id]) delete state.selected[item.id];
+      else state.selected[item.id] = true;
+    }
+    renderItems();
+    renderTotal();
+  }
+
+  function selectedList(){
+    var out = [];
+    GROUPS.forEach(function(g){
+      g.items.forEach(function(item){
+        if (state.selected[item.id]){
+          out.push({ item:item, price:item.price[state.cls] });
+        }
+      });
+    });
+    return out;
+  }
+
+  function renderTotal(){
+    var list = selectedList();
+    if (!list.length){
+      totalVal.textContent = '0 ₽';
+      bookBtn.disabled = true;
+      return;
+    }
+    var sum = 0, approx = false;
+    list.forEach(function(x){ sum += minVal(x.price); if (isApprox(x.price)) approx = true; });
+    totalVal.textContent = (approx ? 'от ' : '') + fmtNum(sum) + ' ₽';
+    bookBtn.disabled = false;
+  }
+
+  function renderAll(){
+    renderClasses();
+    renderItems();
+    renderTotal();
+  }
+
+  // --- запись (bottom sheet) ---
+  var overlay = document.getElementById('overlay');
+  var sheetForm = document.getElementById('sheetForm');
+  var sheetSuccess = document.getElementById('sheetSuccess');
+  var sheetSummary = document.getElementById('sheetSummary');
+
+  function openSheet(){
+    var list = selectedList();
+    var clsLabel = CLASSES.filter(function(c){return c.key===state.cls;})[0].label;
+    var lines = list.map(function(x){ return x.item.name + ' — ' + fmtPrice(x.price); }).join('<br>');
+    sheetSummary.innerHTML = '<b>Класс авто: '+clsLabel+'</b><br>' + lines + '<br><b>Итого: '+totalVal.textContent+'</b>';
+    sheetForm.hidden = false;
+    sheetSuccess.hidden = true;
+    overlay.hidden = false;
+  }
+  function closeSheet(){ overlay.hidden = true; }
+
+  bookBtn.addEventListener('click', openSheet);
+  document.getElementById('closeBtn').addEventListener('click', closeSheet);
+  document.getElementById('closeBtn2').addEventListener('click', closeSheet);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSheet(); });
+
+  document.getElementById('sendBtn').addEventListener('click', function(e){
+    e.preventDefault();
+    sheetForm.hidden = true;
+    sheetSuccess.hidden = false;
+  });
+
+  document.getElementById('svcWrap').addEventListener('click', function(){
+    document.getElementById('calculator').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  // --- "Мой автомобиль": демо-распознавание класса + перекраска фото ---
+  var CAR_HINTS = [
+    {cls:'EXC', label:'Эксклюзив (спорт / люкс)', re:/ferrari|lamborghini|porsche|bentley|rolls[-\s]?royce|bmw\s*m[0-9]|m[-\s]?сери/i},
+    {cls:'XL',  label:'XL (большой внедорожник)',  re:/range\s*rover|\bx7\b|\bgls\b|g[-\s]?класс|g[-\s]?class|\bl9\b/i},
+    {cls:'XXL', label:'XXL / Минивэн',             re:/v[-\s]?класс|v[-\s]?class|6x6|zeekr/i},
+    {cls:'M',   label:'M (компакт, малый класс)',  re:/bmw\s*1\b|1\s*сери|hyundai\s*solaris|\blada\b|kia\s*rio|c[-\s]?класс|c[-\s]?class|\bmini\b/i},
+    {cls:'L',   label:'L (средний / бизнес-класс)',re:/bmw|mercedes|e[-\s]?класс|e[-\s]?class|\bgle\b|кроссовер/i}
+  ];
+  function detectClass(text){
+    if (!text) return null;
+    for (var i=0;i<CAR_HINTS.length;i++){ if (CAR_HINTS[i].re.test(text)) return CAR_HINTS[i]; }
+    return null;
+  }
+
+  var myCarBtn = document.getElementById('myCarBtn');
+  var myCarSection = document.getElementById('myCarSection');
+  myCarBtn.addEventListener('click', function(){
+    myCarSection.hidden = false;
+    myCarSection.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  var carInput = document.getElementById('carInput');
+  var detectResult = document.getElementById('detectResult');
+  document.getElementById('detectBtn').addEventListener('click', function(){
+    var hit = detectClass(carInput.value.trim());
+    if (hit){
+      state.cls = hit.cls;
+      renderAll();
+      detectResult.hidden = false;
+      detectResult.innerHTML = 'Похоже на класс <b style="color:var(--accent)">'+hit.label+'</b> — цены в калькуляторе ниже уже пересчитаны под него. Неверно? Выбери класс вручную в шаге 1.';
+      document.getElementById('calculator').scrollIntoView({behavior:'smooth', block:'start'});
+    } else {
+      detectResult.hidden = false;
+      detectResult.innerHTML = 'В демо-списке нет такой марки — выбери класс вручную в калькуляторе ниже (в реальном боте это определит ИИ).';
+    }
+  });
+
+  var COLORS = [
+    {name:'Чёрный', hex:'#111113'},
+    {name:'Белый', hex:'#f2f1ee'},
+    {name:'Серебро', hex:'#b9bdc2'},
+    {name:'Красный', hex:'#c21f32'},
+    {name:'Синий', hex:'#1f4ea8'},
+    {name:'Зелёный', hex:'#2c6b4f'},
+    {name:'Жёлтый', hex:'#e3c341'},
+    {name:'Хром', hex:'#9aa3a8'}
+  ];
+  var carState = { color:COLORS[0].hex, finish:'gloss', img:null };
+
+  var swatchesBox = document.getElementById('colorSwatches');
+  COLORS.forEach(function(c, i){
+    var el = document.createElement('div');
+    el.className = 'swatch' + (i===0 ? ' sel' : '');
+    el.style.background = c.hex;
+    el.title = c.name;
+    el.tabIndex = 0;
+    el.addEventListener('click', function(){
+      carState.color = c.hex;
+      Array.prototype.forEach.call(swatchesBox.children, function(ch){ ch.classList.remove('sel'); });
+      el.classList.add('sel');
+      drawCar();
+    });
+    swatchesBox.appendChild(el);
+  });
+
+  var FINISHES = [ {key:'gloss', label:'Глянец'}, {key:'satin', label:'Сатин'}, {key:'matte', label:'Мат'} ];
+  var finishTabsBox = document.getElementById('finishTabs');
+  FINISHES.forEach(function(f){
+    var el = document.createElement('div');
+    el.className = 'tab' + (f.key==='gloss' ? ' sel' : '');
+    el.textContent = f.label;
+    el.addEventListener('click', function(){
+      carState.finish = f.key;
+      Array.prototype.forEach.call(finishTabsBox.children, function(ch){ ch.classList.remove('sel'); });
+      el.classList.add('sel');
+      drawCar();
+    });
+    finishTabsBox.appendChild(el);
+  });
+
+  var carCanvas = document.getElementById('carCanvas');
+  var ctx = carCanvas.getContext('2d');
+
+  function hexToRgb(hex){
+    var m = hex.replace('#','');
+    return { r:parseInt(m.substr(0,2),16), g:parseInt(m.substr(2,2),16), b:parseInt(m.substr(4,2),16) };
+  }
+
+  function drawPlaceholderCar(){
+    var w = carCanvas.width, h = carCanvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#17161a';
+    ctx.fillRect(0,0,w,h);
+    var cx = w*0.5, cy = h*0.56;
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.fillStyle = carState.color;
+    ctx.beginPath();
+    ctx.moveTo(-220, 30);
+    ctx.quadraticCurveTo(-210, -40, -110, -55);
+    ctx.quadraticCurveTo(-40, -90, 40, -88);
+    ctx.quadraticCurveTo(120, -70, 150, -40);
+    ctx.quadraticCurveTo(220, -30, 230, 20);
+    ctx.quadraticCurveTo(232, 45, 210, 46);
+    ctx.lineTo(-210, 46);
+    ctx.quadraticCurveTo(-230, 44, -220, 30);
+    ctx.closePath();
+    ctx.fill();
+    if (carState.finish === 'gloss'){
+      var grd = ctx.createLinearGradient(-220,-90,230,46);
+      grd.addColorStop(0,'rgba(255,255,255,.22)');
+      grd.addColorStop(.35,'rgba(255,255,255,.02)');
+      grd.addColorStop(.6,'rgba(0,0,0,.12)');
+      ctx.fillStyle = grd;
+      ctx.fill();
+    } else if (carState.finish === 'matte'){
+      ctx.fillStyle = 'rgba(0,0,0,.18)';
+      ctx.fill();
+    }
+    ctx.fillStyle = '#0c0b0d';
+    ctx.beginPath(); ctx.arc(-120,48,34,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(130,48,34,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#3a373b';
+    ctx.beginPath(); ctx.arc(-120,48,14,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(130,48,14,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    ctx.fillStyle = 'rgba(245,242,239,.35)';
+    ctx.font = '13px Manrope, sans-serif';
+    ctx.fillText('пример силуэта — без загруженного фото', 16, h-14);
+  }
+
+  function drawPhotoCar(){
+    var w = carCanvas.width, h = carCanvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#17161a';
+    ctx.fillRect(0,0,w,h);
+    var img = carState.img;
+    var scale = Math.min(w/img.width, h/img.height);
+    var dw = img.width*scale, dh = img.height*scale;
+    var dx = (w-dw)/2, dy = (h-dh)/2;
+    ctx.drawImage(img, dx, dy, dw, dh);
+
+    ctx.globalCompositeOperation = 'hue';
+    ctx.fillStyle = carState.color;
+    ctx.fillRect(dx, dy, dw, dh);
+    ctx.globalCompositeOperation = 'source-over';
+
+    if (carState.finish === 'matte'){
+      ctx.fillStyle = 'rgba(10,9,10,.28)';
+      ctx.fillRect(dx, dy, dw, dh);
+      ctx.globalCompositeOperation = 'saturation';
+      ctx.fillStyle = '#555';
+      ctx.fillRect(dx, dy, dw, dh);
+      ctx.globalCompositeOperation = 'source-over';
+    } else if (carState.finish === 'satin'){
+      ctx.fillStyle = 'rgba(10,9,10,.12)';
+      ctx.fillRect(dx, dy, dw, dh);
+    } else {
+      var grd = ctx.createLinearGradient(dx,dy,dx+dw,dy+dh);
+      grd.addColorStop(0,'rgba(255,255,255,.18)');
+      grd.addColorStop(.4,'rgba(255,255,255,0)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(dx, dy, dw, dh);
+    }
+  }
+
+  function drawCar(){
+    if (carState.img) drawPhotoCar(); else drawPlaceholderCar();
+  }
+
+  document.getElementById('photoInput').addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var img = new Image();
+      img.onload = function(){ carState.img = img; drawCar(); };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  drawCar();
+
+  renderAll();
+})();
+</script>
