@@ -192,5 +192,32 @@
   "white": [
    "gloss"
   ]
+ },
+ "mercedes_s": {
+  "black": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "burgundy": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "gray": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "silver": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "white": [
+   "gloss",
+   "matte",
+   "satin"
+  ]
  }
 }
