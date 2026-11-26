@@ -123,6 +123,13 @@
   .hero-stage{margin-top:14px; min-height:150px; display:flex; align-items:flex-end; justify-content:center;}
   .hero-stage svg{width:100%; max-width:440px; height:auto; display:block;}
   .hero-photo{width:100%; max-height:240px; object-fit:cover; border-radius:20px; display:block; box-shadow:0 18px 40px rgba(0,0,0,.5);}
+  .render-wrap{position:relative; width:100%; max-width:460px;}
+  .hero-render{position:relative; width:100%; height:auto; display:block;}
+  .render-shadow{
+    position:absolute; left:6%; right:6%; bottom:-2%; height:12%;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,.85), transparent 70%);
+    filter:blur(6px);
+  }
   .hero-actions{display:flex; justify-content:center; gap:8px; margin-top:14px;}
   .hero-empty{padding:28px 18px; margin-top:8px;}
   .hero-empty strong{display:block; font-size:18px; margin-bottom:6px;}
@@ -626,6 +633,36 @@
       '</svg>';
   }
 
+  // --- Студийные картинки моделей (webapp/cars, готовит car-images/process.py) ---
+  var COLOR_HEX = {black:'#141416', white:'#ecebe8', gray:'#6b6e73', silver:'#b8bcc2', blue:'#1f4ea8', red:'#b3172b', green:'#2e6b4f'};
+  var CAR_PHOTOS = [
+    {
+      matches: function(n){ return /bmw|бмв/.test(n) && /x\s?6/.test(n); },
+      colors: {black:'cars/bmw_x6_black.webp'}
+    },
+    {
+      matches: function(n){ return /гелик|гелендв|gelandewagen|g-wagon/.test(n) || (/mercedes|мерседес|amg/.test(n) && /\bg\b|g[\s-]?(класс|class|klasse)|\bg\s?\d{2,3}\b/.test(n)); },
+      colors: {white:'cars/mercedes_g_white.webp'}
+    }
+  ];
+  var MAX_COLOR_DISTANCE = 90;
+  function hexToRgb(hex){ var v = parseInt(hex.slice(1), 16); return [v >> 16, (v >> 8) & 255, v & 255]; }
+  function colorDistance(a, b){
+    var x = hexToRgb(a), y = hexToRgb(b);
+    return Math.sqrt(Math.pow(x[0] - y[0], 2) + Math.pow(x[1] - y[1], 2) + Math.pow(x[2] - y[2], 2));
+  }
+  function studioPhoto(){
+    var name = car.name.toLowerCase();
+    var entry = CAR_PHOTOS.filter(function(p){ return p.matches(name); })[0];
+    if (!entry) return null;
+    var best = null, bestDistance = Infinity;
+    Object.keys(entry.colors).forEach(function(key){
+      var d = colorDistance(car.colorHex, COLOR_HEX[key]);
+      if (d < bestDistance){ bestDistance = d; best = entry.colors[key]; }
+    });
+    return bestDistance <= MAX_COLOR_DISTANCE ? best : null;
+  }
+
   // --- Своё фото машины: хранится только на этом телефоне ---
   var PHOTO_KEY = 'hd_photo:' + car.name;
   function loadPhoto(){ try { return localStorage.getItem(PHOTO_KEY); } catch (e) { return null; } }
@@ -681,11 +718,21 @@
 
     var stage = el('div', 'hero-stage');
     var photo = loadPhoto();
+    var studio = photo ? null : studioPhoto();
     if (photo){
       var img = el('img', 'hero-photo');
       img.alt = car.name;
       img.src = photo;
       stage.appendChild(img);
+    } else if (studio){
+      var wrap = el('div', 'render-wrap');
+      var render = el('img', 'hero-render');
+      render.alt = car.name;
+      render.src = studio;
+      render.onerror = function(){ stage.innerHTML = carSvg(); };
+      wrap.appendChild(el('div', 'render-shadow'));
+      wrap.appendChild(render);
+      stage.appendChild(wrap);
     } else {
       stage.innerHTML = carSvg();
     }
