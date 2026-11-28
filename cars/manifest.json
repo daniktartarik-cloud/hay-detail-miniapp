@@ -161,6 +161,87 @@
    "satin"
   ]
  },
+ "li_l6": {
+  "black": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "burgundy": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "gray": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "silver": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "white": [
+   "gloss",
+   "matte",
+   "satin"
+  ]
+ },
+ "li_l7": {
+  "black": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "burgundy": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "gray": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "silver": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "white": [
+   "gloss",
+   "matte",
+   "satin"
+  ]
+ },
+ "li_l9": {
+  "black": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "burgundy": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "gray": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "silver": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "white": [
+   "gloss",
+   "matte",
+   "satin"
+  ]
+ },
  "mercedes_c": {
   "black": [
    "gloss",
@@ -405,6 +486,60 @@
   ]
  },
  "zeekr_009": {
+  "black": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "burgundy": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "gray": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "silver": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "white": [
+   "gloss",
+   "matte",
+   "satin"
+  ]
+ },
+ "zeekr_8x": {
+  "black": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "burgundy": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "gray": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "silver": [
+   "gloss",
+   "matte",
+   "satin"
+  ],
+  "white": [
+   "gloss",
+   "matte",
+   "satin"
+  ]
+ },
+ "zeekr_9x": {
   "black": [
    "gloss",
    "matte",
