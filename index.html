@@ -295,6 +295,26 @@
     background:rgba(20,19,22,.94); border:1px solid var(--line);
   }
 
+  .admin-month{margin-bottom:22px;}
+  .admin-month-title{font-weight:800; font-size:16px; margin:0 0 10px; text-transform:capitalize;}
+  .admin-grid{display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:5px;}
+  .admin-weekday{text-align:center; font-size:11px; color:var(--muted); padding:2px 0 6px;}
+  .admin-day{
+    aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    border-radius:10px; font-size:13px; font-weight:700; cursor:pointer;
+    background:rgba(255,255,255,.04); border:1px solid var(--line);
+  }
+  .admin-day.empty{background:none; border:none; cursor:default;}
+  .admin-day.today{border-color:var(--accent); color:#fff;}
+  .admin-day.has-bookings{background:var(--accent-soft);}
+  .admin-day.selected{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .admin-day .dot{width:5px; height:5px; border-radius:50%; background:var(--accent);}
+  .admin-day.selected .dot{background:#fff;}
+  .admin-detail{margin-top:10px;}
+  .admin-entry{padding:12px 14px;}
+  .admin-entry + .admin-entry{border-top:1px solid var(--line);}
+  .admin-entry .kv span{min-width:80px;}
+
   [hidden]{display:none !important;}
   button:focus-visible, .chip:focus-visible, .row:focus-visible, .contact:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
   @media (prefers-reduced-motion: no-preference){
@@ -381,6 +401,12 @@
     <div id="faqList"></div>
     <p class="hint" id="faqEmpty" hidden>Такого вопроса пока нет — спроси менеджера в Telegram.</p>
   </section>
+
+  <section class="screen" id="screen-admin" hidden>
+    <h1 class="h1">Календарь заявок</h1>
+    <p class="lead">Дни с записями отмечены точкой. Нажми на день, чтобы увидеть все заявки.</p>
+    <div id="adminMonths"></div>
+  </section>
 </main>
 
 <div class="summary lg" id="summary" hidden>
@@ -405,6 +431,10 @@
   <button class="tab" data-tab="faq" type="button">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>
     <span>FAQ</span>
+  </button>
+  <button class="tab" data-tab="admin" id="adminTab" type="button" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><circle cx="8" cy="15" r="1.3" fill="currentColor" stroke="none"/></svg>
+    <span>Админ</span>
   </button>
 </nav>
 
@@ -496,7 +526,19 @@
   if (car.cls && !car.body) car.body = DEFAULT_BODY[car.cls];
   if (car.cls && !car.name) car.name = 'Мой автомобиль';
 
-  var state = { tab:'home', group:'full', selected:{}, history:[] };
+  // --- Календарь менеджера: бот кладёт заявки текущего/следующего месяца в ссылку ---
+  var adminBookings = null;
+  if (params.get('admin') === '1'){
+    try {
+      var b64 = params.get('data') || '';
+      var bin = atob(b64.replace(/-/g, '+').replace(/_/g, '/'));
+      var bytes = new Uint8Array(bin.length);
+      for (var bi = 0; bi < bin.length; bi++) bytes[bi] = bin.charCodeAt(bi);
+      adminBookings = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    } catch (e) { adminBookings = null; }
+  }
+
+  var state = { tab: adminBookings ? 'admin' : 'home', group:'full', selected:{}, history:[] };
 
   var $ = function(id){ return document.getElementById(id); };
   function el(tag, className, text){
@@ -622,7 +664,10 @@
     {key:'audi_q7', test:/(?=.*\b(audi|ауди)\b)(?=.*\bq7\b)/},
     {key:'toyota_bz3x', test:/bz\s?3\s?x|бз\s?3\s?х/},
     {key:'xiaomi_su7', test:/(xiaomi|сяоми|сяоуми).*su\s?7|su\s?7/},
-    {key:'xiaomi_yu7', test:/(xiaomi|сяоми|сяоуми).*(yu\s?7|u\s?7)|yu\s?7/}
+    {key:'xiaomi_yu7', test:/(xiaomi|сяоми|сяоуми).*(yu\s?7|u\s?7)|yu\s?7/},
+    {key:'vw_golf', test:/(volkswagen|фольксваген|фольцваген|вольксваген|vw\b).*(golf|гольф)|^\s*(golf|гольф)\b/},
+    {key:'vw_tiguan', test:/(volkswagen|фольксваген|фольцваген|вольксваген|vw\b).*(tiguan|тигуан)|^\s*(tiguan|тигуан)\b/},
+    {key:'vw_touareg', test:/(volkswagen|фольксваген|фольцваген|вольксваген|vw\b).*(touareg|туарег)|^\s*(touareg|туарег)\b/}
   ];
   function detectModel(){
     var name = car.name.toLowerCase();
@@ -1139,7 +1184,7 @@
   });
 
   // --- Вкладки ---
-  var TABS = ['home', 'booking', 'profile', 'faq'];
+  var TABS = ['home', 'booking', 'profile', 'faq', 'admin'];
   function setTab(name){
     if (state.tab !== name) haptic('select');
     state.tab = name;
@@ -1152,8 +1197,99 @@
     }
     if (name === 'booking') renderBooking();
     if (name === 'profile') renderProfile();
+    if (name === 'admin') renderAdmin();
     renderSelectionUi();
     window.scrollTo(0, 0);
+  }
+
+  // --- Календарь менеджера ---
+  var MONTH_NAMES_RU = ['', 'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+  var WEEKDAYS_RU = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  var adminSelectedDate = null;
+
+  function adminByDate(){
+    var grouped = {};
+    (adminBookings || []).forEach(function(b){
+      (grouped[b.d] = grouped[b.d] || []).push(b);
+    });
+    return grouped;
+  }
+  function dmyToIso(dmy){
+    var m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(dmy || '');
+    return m ? m[3] + '-' + m[2] + '-' + m[1] : '';
+  }
+  function todayIso(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function renderMonthGrid(year, month, grouped, todayIsoStr){
+    var block = el('div', 'admin-month');
+    block.appendChild(el('div', 'admin-month-title', MONTH_NAMES_RU[month] + ' ' + year));
+    var grid = el('div', 'admin-grid');
+    WEEKDAYS_RU.forEach(function(w){ grid.appendChild(el('div', 'admin-weekday', w)); });
+
+    var first = new Date(year, month - 1, 1);
+    var startOffset = (first.getDay() + 6) % 7; // Пн = 0
+    var daysInMonth = new Date(year, month, 0).getDate();
+    for (var i = 0; i < startOffset; i++) grid.appendChild(el('div', 'admin-day empty'));
+    for (var day = 1; day <= daysInMonth; day++){
+      var iso = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+      var dmy = String(day).padStart(2, '0') + '.' + String(month).padStart(2, '0') + '.' + year;
+      var has = !!(grouped[dmy] && grouped[dmy].length);
+      var cls = 'admin-day' + (iso === todayIsoStr ? ' today' : '') + (has ? ' has-bookings' : '') + (iso === adminSelectedDate ? ' selected' : '');
+      var cell = el('div', cls, String(day));
+      if (has) cell.appendChild(el('span', 'dot'));
+      if (has) cell.addEventListener('click', function(d){ return function(){ adminSelectedDate = (adminSelectedDate === d ? null : d); renderAdmin(); }; }(iso));
+      grid.appendChild(cell);
+    }
+    block.appendChild(grid);
+    return block;
+  }
+
+  function renderAdminDetail(grouped){
+    if (!adminSelectedDate) return null;
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(adminSelectedDate);
+    var dmy = m[3] + '.' + m[2] + '.' + m[1];
+    var items = grouped[dmy] || [];
+    var panel = el('div', 'panel list admin-detail');
+    if (!items.length){
+      panel.appendChild(el('div', 'empty', 'На этот день заявок нет.'));
+      return panel;
+    }
+    items.forEach(function(b){
+      var entry = el('div', 'admin-entry');
+      entry.appendChild(el('div', 'hist-top', (b.t || '—') + ' · ' + (b.n || '—')));
+      var rows = [['Телефон', b.p], ['Машина', b.c], ['Услуги', (b.s || []).join(', ')], ['Итого', b.tt]];
+      if (b.w) rows.push(['Цвет плёнки', b.w]);
+      if (b.cm) rows.push(['Комментарий', b.cm]);
+      rows.forEach(function(r){
+        if (!r[1]) return;
+        var kv = el('div', 'kv');
+        kv.appendChild(el('span', null, r[0]));
+        kv.appendChild(el('b', null, r[1]));
+        entry.appendChild(kv);
+      });
+      panel.appendChild(entry);
+    });
+    return panel;
+  }
+
+  function renderAdmin(){
+    var box = $('adminMonths');
+    box.innerHTML = '';
+    if (!adminBookings){
+      box.appendChild(el('div', 'empty', 'Нет данных. Открой этот экран заново из бота командой /calendar.'));
+      return;
+    }
+    var grouped = adminByDate();
+    var today = new Date();
+    var todayStr = todayIso();
+    box.appendChild(renderMonthGrid(today.getFullYear(), today.getMonth() + 1, grouped, todayStr));
+    var next = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    box.appendChild(renderMonthGrid(next.getFullYear(), next.getMonth() + 1, grouped, todayStr));
+    var detail = renderAdminDetail(grouped);
+    if (detail) box.appendChild(detail);
   }
 
   Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(btn){
@@ -1169,11 +1305,17 @@
   var user = telegramUser();
   if (user && user.first_name) $('fName').value = user.first_name;
 
+  if (adminBookings){
+    $('adminTab').hidden = false;
+    document.querySelector('.tabbar').style.gridTemplateColumns = 'repeat(5, 1fr)';
+  }
+
   renderHero();
   loadManifest();
   renderChips();
   renderList();
   renderFaq();
+  setTab(state.tab);
   renderSelectionUi();
   loadHistory(function(history){
     state.history = history;
