@@ -613,7 +613,13 @@
     {key:'gac_gs8', test:/gs\s?8\b/},
     {key:'gac_s7', test:/(gac|гас\b).*s\s?7\b/},
     {key:'voyah_dream', test:/(voyah|вояж|воя).*(dream|дрим)/},
-    {key:'voyah_free', test:/(voyah|вояж|воя).*(free|фри)/}
+    {key:'voyah_free', test:/(voyah|вояж|воя).*(free|фри)/},
+    {key:'audi_a3', test:/(?=.*\b(audi|ауди)\b)(?=.*\ba3\b)/},
+    {key:'audi_a5', test:/(?=.*\b(audi|ауди)\b)(?=.*\ba5\b)/},
+    {key:'audi_a6', test:/(?=.*\b(audi|ауди)\b)(?=.*\ba6\b)/},
+    {key:'audi_q3', test:/(?=.*\b(audi|ауди)\b)(?=.*\bq3\b)/},
+    {key:'audi_q5', test:/(?=.*\b(audi|ауди)\b)(?=.*\bq5\b)/},
+    {key:'audi_q7', test:/(?=.*\b(audi|ауди)\b)(?=.*\bq7\b)/}
   ];
   function detectModel(){
     var name = car.name.toLowerCase();
